@@ -8,6 +8,13 @@ app.get("/", (req, res) => {
 app.listen(process.env.PORT || 3000, () => {
   console.log("Webserver läuft");
 });
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
 require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 
