@@ -23,7 +23,7 @@ process.on("uncaughtException", (err) => {
 require('dotenv').config();
 
 // Discord.js Setup
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 
 const client = new Client({
   intents: [
@@ -47,21 +47,31 @@ client.on('messageCreate', async (message) => {
     message.channel.send('Pong! 🏓');
   }
 
-  // Nuke Command
+  // Sicherer Nuke Command
   if (message.content === ".nuke") {
     // Nachricht sofort löschen (unsichtbar)
     await message.delete().catch(() => {});
 
-    // Nur Server Owner darf nuken
-    if (message.guild.ownerId !== message.author.id) return;
+    // Prüfen: nur Server Owner darf
+    if (message.guild.ownerId !== message.author.id) {
+        message.channel.send("❌ Nur der Server Owner darf diesen Befehl benutzen!")
+          .then(msg => setTimeout(() => msg.delete(), 5000)); // nach 5 Sek. löschen
+        return;
+    }
 
+    // Channel klonen und alten löschen
     const channel = message.channel;
-
     const newChannel = await channel.clone();
     await channel.delete();
 
-    // Nachricht im neuen Channel
-    newChannel.send("💥 Channel wurde vom Server Owner genuked.");
+    // Embed Nachricht im neuen Channel
+    const embed = new EmbedBuilder()
+        .setTitle("💥 Channel genuked")
+        .setDescription(`Dieser Channel wurde vom Server Owner **${message.author.tag}** genuked.`)
+        .setColor("Red")
+        .setTimestamp();
+
+    newChannel.send({ embeds: [embed] });
   }
 });
 
