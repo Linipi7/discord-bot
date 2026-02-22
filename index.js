@@ -1,16 +1,16 @@
-// Webserver für Render
+// Webserver for Render
 const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Bot läuft!");
+  res.send("Bot is running!");
 });
 
 app.listen(process.env.PORT || 3000, () => {
-  console.log("Webserver läuft");
+  console.log("Webserver is running");
 });
 
-// Fehlerhandling
+// Error handling
 process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection:", reason);
 });
@@ -35,7 +35,7 @@ const client = new Client({
 
 // Ready Event
 client.once('ready', () => {
-  console.log(`Bot ist online als ${client.user.tag}!`);
+  console.log(`Bot is online as ${client.user.tag}!`);
 });
 
 // Commands
@@ -47,27 +47,27 @@ client.on('messageCreate', async (message) => {
     message.channel.send('Pong! 🏓');
   }
 
-  // Sicherer Nuke Command
+  // Safe Nuke Command
   if (message.content === ".nuke") {
-    // Nachricht sofort löschen (unsichtbar)
+    // Delete the command message (invisible)
     await message.delete().catch(() => {});
 
-    // Prüfen: nur Server Owner darf
+    // Only Server Owner can nuke
     if (message.guild.ownerId !== message.author.id) {
-        message.channel.send("❌ Nur der Server Owner darf diesen Befehl benutzen!")
-          .then(msg => setTimeout(() => msg.delete(), 5000)); // nach 5 Sek. löschen
+        message.channel.send("❌ Only the Server Owner can use this command!")
+          .then(msg => setTimeout(() => msg.delete(), 5000)); // delete after 5 sec
         return;
     }
 
-    // Channel klonen und alten löschen
+    // Clone the channel and delete the old one
     const channel = message.channel;
     const newChannel = await channel.clone();
     await channel.delete();
 
-    // Embed Nachricht im neuen Channel
+    // Embed message in the new channel
     const embed = new EmbedBuilder()
-        .setTitle("💥 Channel genuked")
-        .setDescription(`Dieser Channel wurde vom Server Owner **${message.author.tag}** genuked.`)
+        .setTitle("💥 Channel Nuked")
+        .setDescription(`This channel was nuked by the Server Owner **${message.author.tag}**.`)
         .setColor("Red")
         .setTimestamp();
 
